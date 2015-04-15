@@ -15,22 +15,30 @@ program
     .parse(process.argv);
 
 
-if (!program.property || !program.file) {
+if (!program.property || !program.value) {
     console.error("Program args are not correct. See --help");
     process.exit(1);
 }
 
-fs.readFile(program.file, function (err, content) {
+if (program.file) {
+    fs.readFile(program.file, function (err, content) {
 
-    if (err) {
-        console.error('Error reading file ' + program.file + ':' + err);
-        process.exit(1);
-    }
-    var parsedJSON = JSON.parse(content);
-    parsedJSON[program.property] = program.value;
-    console.log(JSON.stringify(parsedJSON, null, 2));
+        if (err) {
+            console.error('Error opening file ' + program.file + ': ' + err);
+            alterJson({});
+        } else {
+            alterJson(JSON.parse(content));
+        }
 
-});
+    });
+} else {
+    alterJson({});
+}
+
+function alterJson(obj) {
+    obj[program.property] = program.value;
+    console.log(JSON.stringify(obj, null, 2));
+}
 
 
 
